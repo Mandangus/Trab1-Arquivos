@@ -6,5 +6,7 @@
 
 ## Para executar o programa  
 Para compilar o programa, é necessário que utilize o comando `make all` (todos os arquivos objetos ficarão localizados numa pasta chamada objects).  
+  
 Para executar o programa, é necessário que utilize o comando `make run`.  
+  
 Para executar o programa juntamente com as verificações do valgrind utilize o comando `make valgrind`.

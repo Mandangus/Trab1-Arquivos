@@ -1,6 +1,6 @@
 # Trabalho de manipulação de Arquivos
-** Disciplina: SCC0215 - Organização de Arquivos **  
-** Autores: **  
+**Disciplina: SCC0215 - Organização de Arquivos**  
+**Autores:**  
     - [Antonio Rodrigues Rigolino](https://github.com/Mandangus)  
     - [Matheus Ventura de Sousa](https://github.com/matheus-sousa007)  
 

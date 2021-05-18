@@ -3,22 +3,36 @@ LIBS=-Wall -Wextra -Wpedantic -pedantic-errors
 CFLAGS=-c -g -O0
 VFLAGS=--leak-check=full --track-origins=yes --show-leak-kinds=all --main-stacksize=8388608
 BINARY=./database
-DEP=veiculo.o linha.o main.o
+DEP= ./objects/veiculo.o ./objects/linha.o ./objects/main.o ./objects/funcoes-gerais.o
 
-all: $(DEP)
+all: createDirObjects $(DEP)
 	$(CC) $(DEP) -o $(BINARY) 
 
-veiculo.o: source/veiculo.c include/veiculo.h
+createDirObjects:
+	mkdir -p ./objects
+
+./objects/veiculo.o: source/veiculo.c include/veiculo.h include/funcoes-gerais.h
 	$(CC) $(CFLAGS) source/veiculo.c $(LIBS)
+	mv veiculo.o ./objects/
 
-linha.o: source/linha. include/linha.h
+
+./objects/linha.o: source/linha.c include/linha.h include/funcoes-gerais.h
 	$(CC) $(CFLAGS) source/linha.c $(LIBS)
+	mv linha.o ./objects/
 
-main.o: source/main.c include/veiculo.h include/linha.h
+./objects/main.o: source/main.c include/veiculo.h include/linha.h include/funcoes-gerais.h
 	$(CC) $(CFLAGS) source/main.c $(LIBS)
+	mv main.o ./objects/
+
+./objects/funcoes-gerais.o: source/funcoes-gerais.c include/funcoes-gerais.h
+	$(CC) $(CFLAGS) source/funcoes-gerais.c $(LIBS)
+	mv funcoes-gerais.o ./objects/
 
 run:
 	$(BINARY)
 
 valgrind:
 	valgrind $(VFLAGS) $(BINARY)
+
+clear:
+	rm -rf ./objects $(BINARY)

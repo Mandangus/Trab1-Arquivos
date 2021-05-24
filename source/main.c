@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../include/funcoes-gerais.h"
 #include "../include/linha.h"
+#include "../include/veiculo.h"
 //#include <linha.h> em comentario por enquanto
 //#include <veiculo.h> em comentario por enquanto
 
@@ -34,8 +35,14 @@ int main(){
 
   switch (num_func){             //para melhor eficiencia usa-se um switch
     case 1:
-
+    { char filenamecsv[20];
+      char filenamebin[20];
+      scanf("%s %s", filenamecsv, filenamebin);
+      scanf("%*c");
+      printf("file csv: %s\nfile bin: %s\n", filenamecsv, filenamebin);
+      writeBin(filenamecsv, filenamebin);
       break;
+    }
     case 2:
       // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
@@ -68,8 +75,13 @@ int main(){
       binarioNaTela(filenamedest);      
       break;
     case 3:
-
+    {
+      char filenamebin[20];
+      scanf("%s", filenamebin);
+      scanf("%*c");
+      printBin(filenamebin);
       break;
+    }
     case 4:
       // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
@@ -87,8 +99,16 @@ int main(){
 
       break;
     case 5:
-
+    {
+      char filenamebin[20];
+      char campo[50];
+      scanf("%s", filenamebin);
+      scanf("%*c");
+      scanf("%s", campo);
+      scanf("%*c");
+      searchPrint(filenamebin, campo);
       break;
+    }
     case 6:
       // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
@@ -114,8 +134,14 @@ int main(){
 
       break;
     case 7:
-
+    {
+      char filenamebin[20];
+      int num_inserts;
+      scanf("%s %d", filenamebin, &num_inserts);
+      scanf("%*c");
+      insert_num_reg(num_inserts, filenamebin);
       break;
+    }
     case 8:
       // Manipulação de string do caminho do arquivo destino
       scanf("%s", filenamedest);
@@ -151,10 +177,3 @@ int main(){
 
   return 0;
 }
-
-
-
-/*
- * 
- *
- */

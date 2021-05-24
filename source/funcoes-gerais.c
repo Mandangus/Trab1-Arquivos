@@ -1,24 +1,29 @@
 #include "../include/funcoes-gerais.h"
 
+// Função que abre o arquivo e o coloca em uma struct com algumas flags
 s_file_t *openfile(char *filename, char *openmode){
 	s_file_t *file = (s_file_t *)malloc(1 * sizeof(s_file_t));
 	file->fp = NULL;
+	// Flag de arquivo vazio
 	file->EmptyFile = '0';
+	// Caso seja o stdin, admite-se ele para ler os registros
 	if(strcmp(filename, "stdin") == 0){
 		file->fp = stdin;
 	}
+	// Caso aconteça falha ao abrir o arquivo
 	else if(filename == NULL || !(file->fp = fopen(filename, openmode))){
 		printf("Erro ao abrir o arquivo!\n");
 		return NULL;
 	}
 	if(strcmp(filename, "stdin") != 0) fseek(file->fp, 0, SEEK_END);
+	// Verifica se o arquivo está vazio
 	if(ftell(file->fp) == 0 && strcmp(filename, "stdin") != 0){
 		file->EmptyFile = '1';
 	}
 	if(strcmp(filename, "stdin") != 0) fseek(file->fp, 0, SEEK_SET);
 	return file;
 }
-
+// Função que fecha o arquivo
 void closefile(s_file_t *s_file){
 	if(s_file != NULL){
 		fclose(s_file->fp);

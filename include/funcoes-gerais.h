@@ -6,11 +6,15 @@
 #include<string.h>
 #include<ctype.h>
 
+#define TRUE 1
+#define FALSE 0
+
 #define FILEPATH "./data/"
 
 typedef struct s_file{
     FILE *fp;
     char EmptyFile;
+    char consistenciaDoArquivo;
 }s_file_t;
 
 void binarioNaTela(char *nomeArquivoBinario);

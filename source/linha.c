@@ -26,7 +26,7 @@ typedef struct dataReg{
     char corLinha[20]; // Tamanho Variável
 } dataReg_t;
 
-header_t *readHeader(s_file_t *dataFile)
+header_t *readHeaderfromCSV(s_file_t *dataFile)
 {
     // Verifica se há ponteiro para o arquivo
     if (dataFile->fp == NULL)
@@ -44,7 +44,7 @@ header_t *readHeader(s_file_t *dataFile)
     header_t *header = (header_t *)calloc(1, sizeof(header_t));
     // Assumindo inconsistência para próxima vez que a informação for escrita
     header->status = '0';
-    header->byteProxReg = 83;
+    header->byteProxReg = 82;
     // Lendo o header do arquivo de entrada
     fscanf(dataFile->fp, "%[^,]", header->descreveCodigo);
     fgetc(dataFile->fp);
@@ -81,7 +81,30 @@ void writeHeader(header_t *header, s_file_t *binFile)
     fwrite(header->descreveLinha, sizeof(char), strlen(header->descreveLinha), binFile->fp);
 }
 
-dataReg_t *readReg(s_file_t *dataFile){
+void writePartialHeader(header_t *header, s_file_t *binFile)
+{
+    // Verifica se há ponteiro para o arquivo
+    if (binFile->fp == NULL)
+    {
+        printf("Arquivo inexistente!\n");
+        return;
+    }
+    // Verifica se o header existe
+    if (header == NULL)
+    {
+        printf("Cabeçalho inexistente!\n");
+        return;
+    }
+
+    // Lê parcialmente o header
+    fwrite(&header->status, sizeof(char), 1, binFile->fp);
+    fseek(binFile->fp, 8, SEEK_CUR);
+    fwrite(&header->nroRegistros, sizeof(int), 1, binFile->fp);
+    fwrite(&header->nroRegRemovidos, sizeof(int), 1, binFile->fp);
+    fseek(binFile->fp, 0, SEEK_END);
+}
+
+dataReg_t *readRegfromCSV(s_file_t *dataFile){
     // Verifica se há ponteiro para o arquivo
     if (dataFile->fp == NULL)
     {
@@ -113,6 +136,8 @@ dataReg_t *readReg(s_file_t *dataFile){
         reg->removido = '1';
         reg->codLinha = atoi(tmp);
     }
+
+    // Lendo o registro do CSV
     fscanf(dataFile->fp, "%c", &reg->aceitaCartao);
     checkEOF = fgetc(dataFile->fp);
     fscanf(dataFile->fp, "%[^,]", reg->nomeLinha);
@@ -124,6 +149,7 @@ dataReg_t *readReg(s_file_t *dataFile){
     reg->tamCor = (strcmp(reg->corLinha,"NULO") == 0)? 0 : strlen(reg->corLinha);
     reg->tamRegistro = sizeof(reg->codLinha) + sizeof(reg->aceitaCartao) + reg->tamNome + reg->tamCor;
     
+    // Caso não tenha conseguido ler, retorna NULO
     if(checkEOF == -1){
         free(reg);
         reg = NULL;
@@ -157,7 +183,125 @@ void writeReg(s_file_t *binFile, dataReg_t *reg){
         fwrite(reg->corLinha, sizeof(char), strlen(reg->corLinha), binFile->fp);
 }
 
-db_t *readDB(s_file_t *dataFile, int nRegistros){
+db_t *readDBfromCSV(s_file_t *dataFile, int nRegistros){
+    // Verifica se há ponteiro para o arquivo
+    if (dataFile->fp == NULL)
+    {
+        printf("Falha no processamento do arquivo.\n");
+        return NULL;
+    }
+    // Verifica se o arquivo está vazio
+    if (dataFile->EmptyFile == '1')
+    {
+        //printf("Arquivo vazio!\n");
+        return NULL;
+    }
+
+    // Lê o banco de dados do CSV
+
+    db_t *db = (db_t *)calloc(1, sizeof(db_t));
+    db->Regdatabase = (dataReg_t **)calloc(DB_BUFFER, sizeof(dataReg_t *));
+
+    db->header = readHeaderfromCSV(dataFile);
+    dataReg_t *tmp = NULL;
+
+    int pos = 0;
+    // Nesse while há condição para limite de número de registros e tambem há a condição de ler até acabarem os registros
+    while(pos < nRegistros && (tmp = readRegfromCSV(dataFile)) != NULL){
+        db->Regdatabase[pos] = tmp;
+        if(db->Regdatabase[pos]->removido == '0') db->header->nroRegRemovidos++;
+        else db->header->nroRegistros++;
+        pos++;
+    }
+    //printf("%d\n%d\n", db->header->nroRegistros, db->header->nroRegRemovidos);
+    return db;
+}
+
+dataReg_t *readRegfromStdin(){
+    dataReg_t *reg = (dataReg_t *)calloc(1, sizeof(dataReg_t));
+
+    char tmp[7] = "\0";
+
+    scanf("%s", tmp);
+    // Caso o primeiro campo seja marcado com asterisco, marca o registro como removido
+    if(tmp[0] == '*'){
+        reg->removido = '0';
+        reg->codLinha = atoi(tmp+1);
+    }
+    // Caso contrário, marca-o como não removido
+    else{
+        reg->removido = '1';
+        reg->codLinha = atoi(tmp);
+    }
+
+    // Lendo o registro a partir do stdin
+
+    fgetc(stdin);
+    scan_quote_string(tmp);
+    reg->aceitaCartao = tmp[0];
+    fgetc(stdin);
+    scan_quote_string(reg->nomeLinha);
+    if(strcmp(reg->nomeLinha, "NULO") != 0) reg->tamNome = strlen(reg->nomeLinha);
+    fgetc(stdin);
+    scan_quote_string(reg->corLinha);
+    if(strcmp(reg->corLinha, "NULO") != 0) reg->tamCor = strlen(reg->corLinha);
+    reg->tamRegistro = sizeof(reg->codLinha) + sizeof(reg->aceitaCartao) + reg->tamNome + reg->tamCor;
+    return reg;
+}
+
+db_t *readDBfromStdin(int nRegistros, header_t *header)
+{
+    // Caso não tenha registros a serem lidos, retorna NULO
+    if(nRegistros == 0) return NULL;
+
+    db_t *db = (db_t *)calloc(1, sizeof(db_t));
+    db->Regdatabase = (dataReg_t **)calloc(DB_BUFFER, sizeof(dataReg_t *));
+
+    // mesclando o header já lido com o banco de dados
+    db->header = header;
+    // Lendo os registros
+    for(int pos = 0; pos < nRegistros; pos++){
+        db->Regdatabase[pos] = readRegfromStdin();
+        if (db->Regdatabase[pos]->removido == '0')
+            db->header->nroRegRemovidos++;
+        else
+            db->header->nroRegistros++;
+    }
+    printf("%d\n%d\n", db->header->nroRegistros, db->header->nroRegRemovidos);
+    return db;
+}
+
+void writeDB(s_file_t *binFile, db_t *db, char writePartialHeaderFlag){
+    // Verifica se há ponteiro para o arquivo
+    if (binFile->fp == NULL)
+    {
+        printf("Arquivo inexistente!\n");
+        return;
+    }
+    if(db == NULL){
+        printf("Banco de dados inexistente!\n");
+        return;
+    }
+
+    // Escreve o header parcialmente caso a flag esteja ativa
+    if(writePartialHeaderFlag) writePartialHeader(db->header, binFile);
+    // Caso contrário, escreve o header completo
+    else writeHeader(db->header, binFile);
+
+    // Declara o arquivo como não vazio
+    binFile->EmptyFile = '0';
+    int pos = 0;
+    // Escrevendo os registros
+    while(db->Regdatabase[pos] != NULL){
+        writeReg(binFile, db->Regdatabase[pos]);
+        pos++;
+    }
+    // Mudando a consistência do arquivo
+    fseek(binFile->fp, 0, SEEK_SET);
+    fwrite("1", sizeof(char), 1, binFile->fp);
+}
+
+header_t *readHeaderfromBIN(s_file_t *dataFile){
     // Verifica se há ponteiro para o arquivo
     if (dataFile->fp == NULL)
     {
@@ -170,46 +314,265 @@ db_t *readDB(s_file_t *dataFile, int nRegistros){
         printf("Arquivo vazio!\n");
         return NULL;
     }
+    if (dataFile->consistenciaDoArquivo == '0')
+        return NULL;
+
+    char checkNotEOF = 1;
+    header_t *header = (header_t *)calloc(1, sizeof(header_t));
+    // Lendo o header do binário
+    header->status = '0';
+    checkNotEOF = fread(&header->byteProxReg, sizeof(ll), 1, dataFile->fp);
+    checkNotEOF = fread(&header->nroRegistros, sizeof(int), 1, dataFile->fp);
+    checkNotEOF = fread(&header->nroRegRemovidos, sizeof(int), 1, dataFile->fp);
+    checkNotEOF = fread(&header->descreveCodigo, sizeof(char), 15, dataFile->fp);
+    checkNotEOF = fread(&header->descreveCartao, sizeof(char), 13, dataFile->fp);
+    checkNotEOF = fread(&header->descreveNome, sizeof(char), 13, dataFile->fp);
+    checkNotEOF = fread(&header->descreveLinha, sizeof(char), 24, dataFile->fp);
+    
+    // Caso não tenha conseguido ler, retorna NULO
+    if (!checkNotEOF)
+    {
+        free(header);
+        header = NULL;
+    }
+    return header;
+}
+
+
+dataReg_t *readRegfromBIN(s_file_t *dataFile){
+    // Verifica se há ponteiro para o arquivo
+    if (dataFile->fp == NULL)
+    {
+        printf("Arquivo inexistente!\n");
+        return NULL;
+    }
+    // Verifica se o arquivo está vazio
+    if (dataFile->EmptyFile == '1')
+    {
+        printf("Arquivo vazio!\n");
+        return NULL;
+    }
+    if(dataFile->consistenciaDoArquivo == '0') return NULL;
+
+    char checkNotEOF = 1;
+    dataReg_t *reg = (dataReg_t *)calloc(1, sizeof(dataReg_t));
+    
+    // Lendo o registro do binário.
+    checkNotEOF = fread(&reg->removido, sizeof(char), 1, dataFile->fp);
+    checkNotEOF = fread(&reg->tamRegistro, sizeof(int), 1, dataFile->fp);
+    checkNotEOF = fread(&reg->codLinha, sizeof(int), 1, dataFile->fp);
+    checkNotEOF = fread(&reg->aceitaCartao, sizeof(char), 1, dataFile->fp);
+    checkNotEOF = fread(&reg->tamNome, sizeof(int), 1, dataFile->fp);
+    if(reg->tamNome != 0) checkNotEOF = fread(&reg->nomeLinha, sizeof(char), reg->tamNome, dataFile->fp);
+    checkNotEOF = fread(&reg->tamCor, sizeof(int), 1, dataFile->fp);
+    if(reg->tamCor != 0) checkNotEOF = fread(&reg->corLinha, sizeof(char), reg->tamCor, dataFile->fp);
+
+    // Caso não tenha conseguido ler, retorna NULO
+    if (!checkNotEOF)
+    {
+        free(reg);
+        reg = NULL;
+    }
+    return reg;
+}
+
+db_t *readDBfromBIN(s_file_t *dataFile)
+{
+    // Verifica se há ponteiro para o arquivo
+    if (dataFile->fp == NULL)
+    {
+        printf("Falha no processamento do arquivo.\n");
+        return NULL;
+    }
+    // Verifica se o arquivo está vazio
+    if (dataFile->EmptyFile == '1')
+    {
+        printf("Arquivo vazio!\n");
+        return NULL;
+    }
+    // Verifica se o arquivo está consistente
+    dataFile->consistenciaDoArquivo = fgetc(dataFile->fp);
+    if(dataFile->consistenciaDoArquivo == '0'){
+        printf("Falha no processamento do arquivo.\n");
+        return NULL;
+    }
 
     db_t *db = (db_t *)calloc(1, sizeof(db_t));
+    // Lendo o header do binário
+    db->header = readHeaderfromBIN(dataFile);
+    db->header->status = dataFile->consistenciaDoArquivo;
     db->Regdatabase = (dataReg_t **)calloc(DB_BUFFER, sizeof(dataReg_t *));
 
-    db->header = readHeader(dataFile);
     dataReg_t *tmp = NULL;
 
+    // Lendo os registros
     int pos = 0;
-    while(pos < nRegistros && (tmp = readReg(dataFile)) != NULL){
+    while ((tmp = readRegfromBIN(dataFile)) != NULL)
+    {
         db->Regdatabase[pos] = tmp;
-        if(db->Regdatabase[pos]->removido == '0') db->header->nroRegRemovidos++;
-        else db->header->nroRegistros++;
         pos++;
     }
-    printf("%d\n%d\n", db->header->nroRegistros, db->header->nroRegRemovidos);
+    //printf("%d", pos);
     return db;
 }
 
-void writeDB(s_file_t *binFile, db_t *db){
-    // Verifica se há ponteiro para o arquivo
-    if (binFile->fp == NULL)
-    {
-        printf("Arquivo inexistente!\n");
-        return;
-    }
-    if(db == NULL){
-        printf("Banco de dados inexistente!\n");
-        return;
-    }
-
-    writeHeader(db->header, binFile);
-
-    binFile->EmptyFile = '0';
+// A busca pelo código da linha é uma busca sequencial que, assim que é encontrada a chave desejada, a busca imediatamente para e retorna
+// o registro desejado visto que não ha duplicações para o campo CodLinha
+db_t *searchCodLinha(db_t *database, int find_linha){
     int pos = 0;
-    while(db->Regdatabase[pos] != NULL){
-        writeReg(binFile, db->Regdatabase[pos]);
+    // Flag de campo encontrado
+    char resultFound = FALSE;
+    db_t *searchResult = NULL;
+    // Busca Sequencial pela chave desejada
+    while(database->Regdatabase[pos] != NULL && !resultFound){
+        if (database->Regdatabase[pos]->removido == '1' && database->Regdatabase[pos]->codLinha == find_linha)
+        {
+            searchResult = (db_t *)calloc(1,sizeof(db_t));
+            searchResult->Regdatabase = (dataReg_t **)calloc(1, sizeof(dataReg_t *));
+            searchResult->Regdatabase[0] = database->Regdatabase[pos];
+            resultFound = TRUE;
+        }
         pos++;
     }
-
-    fseek(binFile->fp, 0, SEEK_SET);
-    fwrite("1", sizeof(char), 1, binFile->fp);
+    return searchResult;
 }
 
+// A busca pelo campo aceita cartão é uma busca sequencial que vai até o fim dos registros visto que pode haver duplicidade de dados nesse campo
+db_t *searchAceitaCartao(db_t *database, char flagAceitaCartao){
+    int pos = 0;
+    db_t *searchResult = (db_t *)calloc(1, sizeof(db_t));
+    searchResult->Regdatabase = (dataReg_t **)calloc(DB_BUFFER, sizeof(dataReg_t *));
+    int pos_res = 0;
+    // busca sequencial
+    while (database->Regdatabase[pos] != NULL){
+        if (database->Regdatabase[pos]->removido == '1' && database->Regdatabase[pos]->aceitaCartao == flagAceitaCartao)
+        {
+            searchResult->Regdatabase[pos_res] = database->Regdatabase[pos];
+            pos_res++;
+        }
+        pos++;
+    }
+    // Caso não tenha encontrado nada, retorna nulo
+    if(pos_res == 0){
+        free(searchResult->Regdatabase);
+        free(searchResult);
+        searchResult = NULL;
+    }
+    return searchResult;
+}
+
+
+// A busca pelo nome da linha é uma busca sequencial que vai até o fim dos registros visto que pode haver duplicidade de dados neste campo
+db_t *searchnomeLinha(db_t *database, char *nomeLinha)
+{
+    int pos = 0;
+    db_t *searchResult = (db_t *)calloc(1, sizeof(db_t));
+    searchResult->Regdatabase = (dataReg_t **)calloc(DB_BUFFER, sizeof(dataReg_t *));
+    int pos_res = 0;
+    // Busca sequencial
+    while (database->Regdatabase[pos] != NULL)
+    {
+        if (database->Regdatabase[pos]->removido == '1' && strcmp(database->Regdatabase[pos]->nomeLinha, nomeLinha) == 0)
+        {
+            searchResult->Regdatabase[pos_res] = database->Regdatabase[pos];
+            pos_res++;
+        }
+        pos++;
+    }
+    // Caso não tenha encontrado nada, ele retorna nulo
+    if (pos_res == 0)
+    {
+        free(searchResult->Regdatabase);
+        free(searchResult);
+        searchResult = NULL;
+    }
+    return searchResult;
+}
+
+// A busca pela cor da linha é uma busca sequencial que termina após verificar todos os registros visto que pode haver duplicidade de dados nesse campo
+db_t *searchcorLinha(db_t *database, char *corLinha)
+{
+    int pos = 0;
+    db_t *searchResult = (db_t *)calloc(1, sizeof(db_t));
+    searchResult->Regdatabase = (dataReg_t **)calloc(DB_BUFFER, sizeof(dataReg_t *));
+    int pos_res = 0;
+    // Busca sequencial
+    while (database->Regdatabase[pos] != NULL)
+    {
+        if (database->Regdatabase[pos]->removido == '1' && strcmp(database->Regdatabase[pos]->corLinha, corLinha) == 0)
+        {
+            searchResult->Regdatabase[pos_res] = database->Regdatabase[pos];
+            pos_res++;
+        }
+        pos++;
+    }
+    // Caso não tenha encontrado nada, retorna nulo
+    if (pos_res == 0)
+    {
+        free(searchResult->Regdatabase);
+        free(searchResult);
+        searchResult = NULL;
+    }
+    return searchResult;
+}
+
+
+// A função de busca de atributo é uma função que reune e seleciona qual função será utilizada
+db_t *searchAttrib(db_t *database, char *attribute, char *find_key){
+    db_t *searchResult = NULL;
+    if(strcmp(attribute, "codLinha") == 0) searchResult = searchCodLinha(database, atoi(find_key));
+    else if (strcmp(attribute, "aceitaCartao") == 0) searchResult = searchAceitaCartao(database, find_key[0]);
+    else if (strcmp(attribute, "nomeLinha") == 0) searchResult = searchnomeLinha(database, find_key);
+    else if (strcmp(attribute, "corLinha") == 0) searchResult = searchcorLinha(database, find_key);
+    return searchResult;
+}
+
+
+// Essa função mostra na tela todos os resultados encontrados com exceção dos excluidos
+void printSearchResult(db_t *searchResult, char *searchfieldname){
+    if(searchResult == NULL){ 
+        printf("Registro inexistente.\n");
+        return;
+    }
+
+    int pos = 0;
+    // Loop para mostrar os resultados
+    while(searchResult->Regdatabase[pos] != NULL){
+        if(searchResult->Regdatabase[pos]->removido == '1'){
+            // Printa o codLinha
+            if(searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "codLinha") != 0)) printf("%s: %d\n", searchResult->header->descreveCodigo, searchResult->Regdatabase[pos]->codLinha);
+            // Printa o nomeLinha
+            if (searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "nomeLinha") != 0))
+            {
+                printf("%s: ", searchResult->header->descreveNome);
+                if(searchResult->Regdatabase[pos]->tamNome == 0) printf("campo com valor nulo\n");
+                else printf("%s\n", searchResult->Regdatabase[pos]->nomeLinha);
+            }
+            // Printa o corLinha
+            if (searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "corLinha") != 0))
+            {
+                printf("%s: ", searchResult->header->descreveLinha);
+                if(searchResult->Regdatabase[pos]->tamCor == 0) printf("campo com valor nulo\n");
+                else printf("%s\n", searchResult->Regdatabase[pos]->corLinha);
+            }
+            // Printa o aceita cartão
+            if (searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "aceitaCartao") != 0))
+            {
+                printf("%s: ", searchResult->header->descreveCartao);
+                switch(searchResult->Regdatabase[pos]->aceitaCartao){
+                    case 'S':
+                        printf("PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR\n");
+                        break;
+                    case 'N':
+                        printf("PAGAMENTO EM CARTAO E DINHEIRO\n");
+                        break;
+                    case 'F':
+                        printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
+                        break;
+                }
+            }
+            printf("\n");
+        }
+        pos++;
+    }
+}

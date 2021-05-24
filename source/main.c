@@ -23,8 +23,12 @@ int main(){
   char tmp[50] = "\0";
 
   s_file_t *filesrc = NULL, *filedest = NULL;
-  db_t *db = NULL;
+  db_t *db = NULL, *searchResult = NULL;
+  header_t *header = NULL;
   int nRegistros = 0;
+
+  char searchfieldname[30] = "\0";
+  char find_key[100] = "\0";
 
   strcpy(tmp, FILEPATH);
 
@@ -33,16 +37,21 @@ int main(){
 
       break;
     case 2:
+      // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
       strcat(tmp, filenamesrc);
       strcpy(filenamesrc, tmp);
 
       filesrc = openfile(filenamesrc, "r");
 
-      db = readDB(filesrc, 10000000);
+      // readDBfromCSV - parâmetros: 
+      //  - ponteiro da struct que contém o arquivo origem
+      //  - número de registros: para indicar o infinito, foi usado o nº: 10000000
+      db = readDBfromCSV(filesrc, 10000000);
 
       closefile(filesrc);
 
+      // Manipulação de string do caminho do arquivo destino
       scanf("%s", filenamedest);
       strcpy(tmp, FILEPATH);
       strcat(tmp, filenamedest);
@@ -50,7 +59,9 @@ int main(){
 
       filedest = openfile(filenamedest, "wb");
 
-      writeDB(filedest, db);
+      // Escreve o db no arquivo destino.
+
+      writeDB(filedest, db, 0);
 
       closefile(filedest);
 
@@ -60,20 +71,53 @@ int main(){
 
       break;
     case 4:
+      // Manipulação de string do caminho do arquivo origem
+      scanf("%s", filenamesrc);
+      strcat(tmp, filenamesrc);
+      strcpy(filenamesrc, tmp);
+
+      filesrc = openfile(filenamesrc, "rb");
+
+      db = readDBfromBIN(filesrc);
+
+      closefile(filesrc);
+
+      // mostra na tela todos os registros encontrados no arquivo destino com exceção dos excluidos
+      printSearchResult(db, NULL);
 
       break;
     case 5:
 
       break;
     case 6:
+      // Manipulação de string do caminho do arquivo origem
+      scanf("%s", filenamesrc);
+      strcat(tmp, filenamesrc);
+      strcpy(filenamesrc, tmp);
+
+      filesrc = openfile(filenamesrc, "rb");
+
+      db = readDBfromBIN(filesrc);
+
+      closefile(filesrc);
+
+      fgetc(stdin);
+      scanf("%s ", searchfieldname);
+      scanf("%s", find_key);
+
+      // procura o campo desejado
+      searchResult = searchAttrib(db, searchfieldname, find_key);
+      if(searchResult != NULL) searchResult->header = db->header;
+
+      // Mostra na tela todos os resultados encontrados, com exceção dos removidos
+      printSearchResult(searchResult, searchfieldname);
 
       break;
     case 7:
 
       break;
     case 8:
-      filesrc = openfile("stdin", "r");
-
+      // Manipulação de string do caminho do arquivo destino
       scanf("%s", filenamedest);
       strcpy(tmp, FILEPATH);
       strcat(tmp, filenamedest);
@@ -82,11 +126,19 @@ int main(){
       scanf("%d", &nRegistros);
       fgetc(stdin);
 
-      db = readDB(filesrc, nRegistros);
+      filedest = openfile(filenamedest, "rb+");
 
-      filedest = openfile(filenamedest, "wb");
+      // posiciona o ponteiro do arquivo para depois do status
+      fseek(filedest->fp, 1, SEEK_SET);
+      header = readHeaderfromBIN(filedest);
 
-      writeDB(filedest, db);
+      db = readDBfromStdin(nRegistros, header);
+
+      header = NULL;
+
+      // posiciona o ponteiro no início do arquivo
+      fseek(filedest->fp, 0, SEEK_SET);
+      writeDB(filedest, db, 1);
 
       closefile(filedest);
 
@@ -99,3 +151,10 @@ int main(){
 
   return 0;
 }
+
+
+
+/*
+ * 
+ *
+ */

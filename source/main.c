@@ -35,11 +35,15 @@ int main(){
 
   switch (num_func){             //para melhor eficiencia usa-se um switch
     case 1:
-    { char filenamecsv[20];
+    {
+      char filenamecsv[20];
       char filenamebin[20];
       scanf("%s %s", filenamecsv, filenamebin);
       scanf("%*c");
       printf("file csv: %s\nfile bin: %s\n", filenamecsv, filenamebin);
+      // writeBin - parâmetros:
+      // - nome de um arquivo CSV com o formato especificado já existente, ou seja, modo "r"
+      // - nome para um arquivo binário que será gerado a partir desse csv, ou seja, modo "wb+", o + é necessário para manipulações no header
       writeBin(filenamecsv, filenamebin);
       break;
     }
@@ -76,6 +80,8 @@ int main(){
       char filenamebin[20];
       scanf("%s", filenamebin);
       scanf("%*c");
+      //printBin - parâmetros
+      // - nome do arquivo binário (JÁ EXISTENTE) que terá seus conteúdos lidos e será impresso, ou seja, modo "rb".          
       printBin(filenamebin);
       break;
     }
@@ -102,6 +108,9 @@ int main(){
       scanf("%*c");
       scanf("%s", campo);
       scanf("%*c");
+      // searchPrint - parâmetros:
+      // - nome de um arquivo binário no qual já estão contidos os registros, ou seja, modo "rb"
+      // - string que define o campo procurado. O valor do campo será coletado dentro da função
       searchPrint(filenamebin, campo);
       break;
     }
@@ -134,6 +143,9 @@ int main(){
       int num_inserts;
       scanf("%s %d", filenamebin, &num_inserts);
       scanf("%*c");
+      // insert_num_reg - parâmetros:
+      // - número de inserções que serão realizadas
+      // - nome do arquivo binário já existente que será o destino das inserções, ou seja, modo "rb+" pois o arquivo já existe e precisamos ler E escrever.
       insert_num_reg(num_inserts, filenamebin);
       break;
     }

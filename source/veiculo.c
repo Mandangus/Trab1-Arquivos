@@ -3,8 +3,8 @@
 
 struct header_veic
 {
-    char status;
-    int64_t byteProxReg;
+    char status;// '0' -> arquivo em risco '1' -> arquivo íntegro
+    int64_t byteProxReg;// offset
     int nroRegistros;
     int nroRegRemovidos;
     char descrevePrefixo[18];
@@ -17,7 +17,7 @@ struct header_veic
 
 struct reg_veic
 {
-    char removido;
+    char removido;// '0' -> registro logicamente '1' -> registro normal
     int tamanhoRegistro;
     int tamanhoModelo;
     int tamanhoCategoria;
@@ -29,7 +29,7 @@ struct reg_veic
     char* categoria;
 };
 
-int updateHeader(int status,int64_t offset,int regnum,int regrm,FILE*fp)//atualizar o header, se o valor for diferente de -1 mudamos o campo correspndente
+int updateHeader(int status,int64_t offset,int regnum,int regrm,FILE*fp)//atualiza o header, se o valor for diferente de -1 mudamos o campo correspndente.
 {
 	if (status!=-1)
 	{
@@ -132,26 +132,26 @@ int escreveHeader(FILE* fp_csv,FILE*fp_bin)
 	return 0;
 }
 
-regv_t scanReg(FILE* fp)
+regv_t scanReg(FILE* fp)	//	dado um ponteiro para um csv na posição correta, lemos um registro. Retorna o registro lido
 {
 	regv_t registro;
 	char temp[30];
 	fscanf(fp,"%[^,]",registro.prefixo);
-	if (registro.prefixo[0]=='*')
+	if (registro.prefixo[0]=='*')//  caso o registro seja logicamente removido precisamos coletar apenas o prefixo sem o *
 	{
-		registro.removido = '0';
+		registro.removido = '0';// indicamos que é logicamente removido
 		for (int i = 1; i < 5; i++)
 		{
-			registro.prefixo[i-1]=registro.prefixo[i];
+			registro.prefixo[i-1]=registro.prefixo[i];//movemos a string 1 para a esquerda
 		}
-		registro.prefixo[4]='\0';
+		registro.prefixo[4]='\0';//ultimo valor como \0 assim como orienta o pdf
 	}else
 	{
-		registro.removido = '1';
+		registro.removido = '1';// caso contrário tudo corre normal
 	}
-	fseek(fp,1,SEEK_CUR);
+	fseek(fp,1,SEEK_CUR);// pulamos a virgula
 	fscanf(fp,"%[^,]",registro.data);
-	if (strcmp(registro.data,"NULO")==0)
+	if (strcmp(registro.data,"NULO")==0)// caso a data seja nula precisamos tratar o lixo com '\0' @ @ @ @ @ @
 	{
 		registro.data[0]='\0';
 		for (int i = 1; i < 10; i++)
@@ -162,12 +162,12 @@ regv_t scanReg(FILE* fp)
 	}
 	fseek(fp,1,SEEK_CUR);
 	fscanf(fp,"%[^,]",temp);
-	registro.quantidadeLugares=atoi(temp);
+	registro.quantidadeLugares=atoi(temp);// coletamos tudo no csv como char, portanto, precisamos dar um atoi no vetor temporário "temp"
 	fseek(fp,1,SEEK_CUR);
 	fscanf(fp,"%[^,]",temp);
 	if (strcmp("NULO",temp)==0)
 	{
-		registro.codLinha=-1;
+		registro.codLinha=-1; // caso o campo seja NULL como temos um inteiro a convenção é setarmos como -1
 	}else
 	{
 		registro.codLinha=atoi(temp);
@@ -176,11 +176,11 @@ regv_t scanReg(FILE* fp)
 	fscanf(fp,"%[^,]",temp);
 	if (strcmp("NULO",temp)==0)	
 	{
-		registro.tamanhoModelo=0;
+		registro.tamanhoModelo=0; // caso nao haja string a ser lida o tamanho é posto como 0 e o ponteiro como NULL
 		registro.modelo = NULL;
 	}else
 	{
-		registro.tamanhoModelo = strlen(temp);
+		registro.tamanhoModelo = strlen(temp);// caso contrário pegamos o tamanho da varável temporária e alocamos espaço para o ponteiro
 		registro.modelo = (char*)calloc(registro.tamanhoModelo,sizeof(char));
 		strcpy(registro.modelo,temp);
 	}
@@ -197,8 +197,8 @@ regv_t scanReg(FILE* fp)
 		registro.categoria = (char*)calloc(registro.tamanhoCategoria,sizeof(char));
 		strcpy(registro.categoria,temp);
 	}
-	registro.tamanhoRegistro = 36 + registro.tamanhoCategoria + registro.tamanhoModelo;
-	return registro;
+	registro.tamanhoRegistro = 36 + registro.tamanhoCategoria + registro.tamanhoModelo;//aqui geramos o tamanho do registro como 5 bytes  A MAIS ,
+	return registro;                                                                   //já que no insert vamos usar o tamanho como offset e depois escrevemos o tamanho -5 adequadamente
 }
 
 int insertBin(regv_t registro,FILE*fp)
@@ -233,10 +233,10 @@ int insertBin(regv_t registro,FILE*fp)
 	return 0;
 }
 
-int countLines(FILE*fp)
+int countLines(FILE*fp)// funcao para contar as linhas de um csv
 {
 	char meuChar;
-	int count = -1;
+	int count = -1;//começa com -1 para ignorarmos o header
 	while (meuChar!=EOF)
 	{
 		meuChar = getc(fp);
@@ -244,27 +244,27 @@ int countLines(FILE*fp)
 	}
 	return count;
 }
-regv_t get_reg_bin(FILE* fp)
+regv_t get_reg_bin(FILE* fp)// dado um ponteiro para um arquivo binario na pos certa, retornamos o registro contido na mesma.
 {
 	regv_t registro;
-	fread(&registro.removido,1,1,fp);
-	fread(&registro.tamanhoRegistro,4,1,fp);
-	fread(&registro.prefixo,5,1,fp);
+	fread(&registro.removido,1,1,fp);//			aqui lemos normalmente os campos de tamanho fixo 
+	fread(&registro.tamanhoRegistro,4,1,fp);//			|	|	|	|	|
+	fread(&registro.prefixo,5,1,fp);//				V	V	V	V	V
 	fread(&registro.data,10,1,fp);
 	fread(&registro.quantidadeLugares,4,1,fp);
 	fread(&registro.codLinha,4,1,fp);
-	fread(&registro.tamanhoModelo,4,1,fp);
-	if (registro.tamanhoModelo!=0)
+	fread(&registro.tamanhoModelo,4,1,fp);			
+	if (registro.tamanhoModelo!=0)// se o indicador de tamanho for != de 0 sabemos que existe um campo string
 	{
-		registro.modelo = (char*)calloc(registro.tamanhoModelo,sizeof(char));
+		registro.modelo = (char*)calloc(registro.tamanhoModelo,sizeof(char));// alocamos um espaço
 		for (int i = 0; i < registro.tamanhoModelo; i++)
 		{
-			char meuChar = getc(fp);
+			char meuChar = getc(fp);//		e coletamos do arquivo binario a string
 			registro.modelo[i]=meuChar;
 		}
 	}
 	fread(&registro.tamanhoCategoria,4,1,fp);
-	if (registro.tamanhoCategoria!=0)
+	if (registro.tamanhoCategoria!=0)//		mesmo procedimento do "modelo"
 	{
 		registro.categoria = (char*)calloc(registro.tamanhoCategoria,sizeof(char));
 		for (int i = 0; i < registro.tamanhoCategoria; i++)
@@ -275,12 +275,13 @@ regv_t get_reg_bin(FILE* fp)
 	}
 	return registro;
 }
-void printReg(regv_t registro)
+void printReg(regv_t registro) //	Dado um registro, imprimimos de acordo com o padrao requisitado
 {
+	//	Definimos este vetor com os nomes dos meses para que seja mais fácil de escrever qual o mes a partir do seu numero (INDEXADO EM 0)
 	char meses[12][20] = {
 		{"janeiro"},{"fevereiro"},{"marco"},{"abril"},{"maio"},{"junho"},{"julho"},{"agosto"},{"setembro"},{"outubro"},{"novembro"},{"dezembro"}
 	};
-	printf("Prefixo do veiculo: ");
+	printf("Prefixo do veiculo: ");// Como o campo não possui \0 imprimimos char por char
 	for (int i = 0; i < 5; i++)
 	{
 		printf("%c",registro.prefixo[i]);
@@ -292,7 +293,7 @@ void printReg(regv_t registro)
 		printf("%s\n",registro.modelo);
 	}else
 	{
-		printf("campo com valor nulo\n");
+		printf("campo com valor nulo\n"); //	tratando dos possiveis campos nulos
 	}
 	printf("Categoria do veiculo: ");
 	if(registro.tamanhoCategoria!=0)
@@ -305,10 +306,12 @@ void printReg(regv_t registro)
 	printf("Data de entrada do veiculo na frota: ");
 	if (registro.data[0]!='\0')
 	{
-		char dia[3]={registro.data[8],registro.data[9],'\0'};
+		char dia[3]={registro.data[8],registro.data[9],'\0'}; // 				pegamos da string data o mes, dia e ano para facilitar a impressao
 		char ano[5]={registro.data[0],registro.data[1],registro.data[2],registro.data[3],'\0'};
 		char mes[3]={registro.data[5],registro.data[6],'\0'};
-		int num_mes = atoi(mes);
+		int num_mes = atoi(mes);// atoi no numero do mes (INDEXADO EM 1)
+		//					______________________|
+		//					|
 		printf("%s de %s de %s\n",dia,meses[num_mes-1],ano);
 	}else
 	{
@@ -325,7 +328,7 @@ void printReg(regv_t registro)
 	printf("\n");
 	return;
 }
-void printBin(char*filename)
+void printBin(char*filename)// dado um arquivo binario imprimimpos todos seus registros nao removidos
 {
 	FILE* fp = fopen(filename,"rb");//so vamos ler e printar
 	int regnum = checkRegnum(fp);
@@ -336,10 +339,10 @@ void printBin(char*filename)
 		printf("Registro inexistente.\n");
 		return;
 	}
-	while (cont<regnum)
+	while (cont<regnum)//imprimimos o numero existente de registros
 	{
-		regv_t registro = get_reg_bin(fp);
-		if (registro.removido=='1')
+		regv_t registro = get_reg_bin(fp);//coletamos o registro
+		if (registro.removido=='1')// se n for removido imprimimos
 		{
 			printReg(registro);
 			cont++;
@@ -351,7 +354,7 @@ void printBin(char*filename)
 }
 
 
-int getReg(regv_t *registro)
+int getReg(regv_t *registro)// ler um registro da entrada padrao (stdin) para inserir. 
 {
 	char aux[45];
 	scan_quote_string(registro->prefixo);//scan no prefixo com a mesma regra de tratamento do * da função scanReg
@@ -419,31 +422,31 @@ int insert_num_reg(int num_ins,char*filenamebin)
 	FILE *fp_bin = fopen(filenamebin,"rb+");//escrite e leitura em binario
 	for (int i = 0; i < num_ins; i++)
 	{
-		regv_t registro;
-		getReg(&registro);
-		insertBin(registro,fp_bin);
+		regv_t registro;//definimos um registro temporario
+		getReg(&registro);//coletamos do stdin
+		insertBin(registro,fp_bin);//inserimos
 	}
 	fclose(fp_bin);
 	binarioNaTela(filenamebin);
 	return 0;
 }
-int checkRem(FILE*fp)
+int checkRem(FILE*fp)//checando o campo 'removido' de um registro
 {
 	char meuChar;
-	meuChar = getc(fp);
+	meuChar = getc(fp);// usamos getc para que retorne EOF caso o final do arquivo seja encontrado
 	if (meuChar==EOF)
 	{
 		return -1;
 	}
 	return atoi(&meuChar);
 }
-int checkTam(FILE*fp)
+int checkTam(FILE*fp)// checando o campo 'tamanho' de um registro
 {
 	int tam;
 	fread(&tam,4,1,fp);
 	return tam;
 }
-int getCampo(char*campo,char* valor)
+int getCampo(char*campo,char* valor)// com a string dada no stdin indentificamos qual campo ela se trata
 {
 	int qual = -1;
 	char valores[5][50]={
@@ -460,14 +463,14 @@ int getCampo(char*campo,char* valor)
 	scan_quote_string(valor);
 	return qual;
 }
-int64_t searchOffset(FILE* fp,int qual,char* valor)
-{
-	int rem = 0;
-	int64_t start = ftell(fp);
+int64_t searchOffset(FILE* fp,int qual,char* valor)// dado um ponteiro para um arquivo binario na posição correta, o codigo de qual campo é desejado e o valor de dito campo 
+{							//		retorne o offset do próximo registro que é compatível, caso contrário (EOF), retorne -1
+	int rem = 0;// se o registro for logicamente removido nao vamos ler
+	int64_t start = ftell(fp);// pegamos nossa posicao para retornar caso seja o valor certo
 	while (rem != -1)
 	{
-		rem = checkRem(fp);
-		int tam = checkTam(fp);
+		rem = checkRem(fp);//pegamos o valor do campo 'removido'
+		int tam = checkTam(fp);// 	//            'tamanho'
 		if (rem==1)
 		{
 			switch (qual)
@@ -477,6 +480,7 @@ int64_t searchOffset(FILE* fp,int qual,char* valor)
 				char prefixo[5];
 				fread(prefixo,5,1,fp);
 				int k=0;
+				//strcmp nao estava funcionando (suspeto pelo fato do campo nao possuir \0)
 				for (int i = 0; i < 5; i++)
 				{
 					if (prefixo[i]==valor[i])
@@ -558,12 +562,12 @@ int64_t searchOffset(FILE* fp,int qual,char* valor)
 				break;
 			}	
 			default:
-				printf("ERRO NO PROCESSAMENTO DO ARQUIVO\n");
+				printf("Falha no processamento do arquivo.\n");// o campo nao existe
 				break;
 			}
 		}
-		start = start + tam + 5;
-		fseek(fp,start,SEEK_SET);
+		start = start + tam + 5;//selecionamos o offset do novo registro
+		fseek(fp,start,SEEK_SET);//vamos ate la
 	}
 	return -1;
 }
@@ -573,17 +577,21 @@ int searchPrint(char* filename, char* campo)
 {
 	int64_t offset = 175;
 	FILE *fp = fopen(filename,"rb");//somente leitura em binario
-	if(fp==NULL) return -1;
-	char valor[40];
-	int qual_campo = getCampo(campo,valor);
-	fseek(fp,offset,SEEK_SET);
-	while (offset!=-1)
+	if(fp==NULL)
 	{
-		offset = searchOffset(fp,qual_campo,valor);
+		printf("Falha no processamento do arquivo.\n");//arquivo nao existe
+		return -1;
+	} 
+	char valor[40];//	existem varios tipos de dados que o campo pode assumir mas todos eles podem ser resgatados a partir de um vetor
+	int qual_campo = getCampo(campo,valor);//identificamos o campo e colocamos o valor no vetor 'valor[40]'
+	fseek(fp,offset,SEEK_SET);//colocamos o ponteiro na posicao correta
+	while (offset!=-1)// enquanto !EOF...
+	{
+		offset = searchOffset(fp,qual_campo,valor);//achamos o offset
 		if(offset!=-1)
 		{
-			fseek(fp,offset,SEEK_SET);
-			regv_t registro = get_reg_bin(fp);
+			fseek(fp,offset,SEEK_SET);//vamos ao offset
+			regv_t registro = get_reg_bin(fp);//pegamos um registro do binario
 			printReg(registro);
 		} 
 	}
@@ -593,29 +601,29 @@ int searchPrint(char* filename, char* campo)
 
 int writeBin(char* filenamecsv,char* filenamebin)
 {
-	FILE *fp_csv = fopen(filenamecsv,"r");
+	FILE *fp_csv = fopen(filenamecsv,"r");// so precisamos ler o csv
 	if(fp_csv==NULL)
 	{
-		printf("ERRO NA LEITURA DO CSV\n");
+		printf("Falha no processamento do arquivo.\n");
 		return -1;
 	}
-	FILE *fp_bin = fopen(filenamebin,"wb+");
+	FILE *fp_bin = fopen(filenamebin,"wb+");// ler e escrever um binario inexistente
 	if(fp_bin==NULL)
 	{
-		printf("ERRO NA LEITURA DO CSV\n");
+		printf("Falha no processamento do arquivo.\n");
 		return -1;
 	}
-	int regnum = countLines(fp_csv);
-	escreveHeader(fp_csv,fp_bin);
+	int regnum = countLines(fp_csv);// contamos as linhas do csv
+	escreveHeader(fp_csv,fp_bin);//escrevemos o header com a descrição dos campos do csv
 	int i =0;
-	while (i<regnum)
+	while (i<regnum)//enquanto todos os arquivos nao foram lidos 
 	{
-		regv_t registro = scanReg(fp_csv);
-		insertBin(registro,fp_bin);
+		regv_t registro = scanReg(fp_csv);//ler um registro do csv
+		insertBin(registro,fp_bin);//inserir
 		i++;
 	}
-	fclose(fp_bin);
-	fclose(fp_csv);
+	fclose(fp_bin);//fechamos pois acabou a manipulação
+	fclose(fp_csv);// idem
 	binarioNaTela(filenamebin);
 	return 0;
 }

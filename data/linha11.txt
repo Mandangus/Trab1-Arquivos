@@ -1,0 +1,4 @@
+Nome da linha: campo com valor nulo
+Cor que descreve a linha: PRATA
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+

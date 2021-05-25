@@ -46,33 +46,30 @@ int main(){
     case 2:
       // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
-      strcat(tmp, filenamesrc);
-      strcpy(filenamesrc, tmp);
-
+      
       filesrc = openfile(filenamesrc, "r");
+      if(filesrc != NULL){
+        // readDBfromCSV - parâmetros: 
+        //  - ponteiro da struct que contém o arquivo origem
+        //  - número de registros: para indicar o infinito, foi usado o nº: 10000000
+        db = readDBfromCSV(filesrc, 10000000);
 
-      // readDBfromCSV - parâmetros: 
-      //  - ponteiro da struct que contém o arquivo origem
-      //  - número de registros: para indicar o infinito, foi usado o nº: 10000000
-      db = readDBfromCSV(filesrc, 10000000);
+        closefile(filesrc);
 
-      closefile(filesrc);
+        // Manipulação de string do caminho do arquivo destino
+        scanf("%s", filenamedest);
+        
+        filedest = openfile(filenamedest, "wb");
 
-      // Manipulação de string do caminho do arquivo destino
-      scanf("%s", filenamedest);
-      strcpy(tmp, FILEPATH);
-      strcat(tmp, filenamedest);
-      strcpy(filenamedest, tmp);
+        if(filedest != NULL){
+          // Escreve o db no arquivo destino.
+          writeDB(filedest, db, 0);
 
-      filedest = openfile(filenamedest, "wb");
+          closefile(filedest);
 
-      // Escreve o db no arquivo destino.
-
-      writeDB(filedest, db, 0);
-
-      closefile(filedest);
-
-      binarioNaTela(filenamedest);      
+          binarioNaTela(filenamedest);      
+        }
+      }
       break;
     case 3:
     {
@@ -85,18 +82,17 @@ int main(){
     case 4:
       // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
-      strcat(tmp, filenamesrc);
-      strcpy(filenamesrc, tmp);
-
+      
       filesrc = openfile(filenamesrc, "rb");
 
-      db = readDBfromBIN(filesrc);
+      if(filesrc != NULL){  
+        db = readDBfromBIN(filesrc);
 
-      closefile(filesrc);
+        closefile(filesrc);
 
-      // mostra na tela todos os registros encontrados no arquivo destino com exceção dos excluidos
-      printSearchResult(db, NULL);
-
+        // mostra na tela todos os registros encontrados no arquivo destino com exceção dos excluidos
+        printSearchResult(db);
+      }
       break;
     case 5:
     {
@@ -112,26 +108,25 @@ int main(){
     case 6:
       // Manipulação de string do caminho do arquivo origem
       scanf("%s", filenamesrc);
-      strcat(tmp, filenamesrc);
-      strcpy(filenamesrc, tmp);
-
+      
       filesrc = openfile(filenamesrc, "rb");
 
-      db = readDBfromBIN(filesrc);
+      if(filesrc != NULL){
+        db = readDBfromBIN(filesrc);
 
-      closefile(filesrc);
+        closefile(filesrc);
 
-      fgetc(stdin);
-      scanf("%s ", searchfieldname);
-      scanf("%s", find_key);
+        fgetc(stdin);
+        scanf("%s ", searchfieldname);
+        scan_quote_string(find_key);
 
-      // procura o campo desejado
-      searchResult = searchAttrib(db, searchfieldname, find_key);
-      if(searchResult != NULL) searchResult->header = db->header;
+        // procura o campo desejado
+        searchResult = searchAttrib(db, searchfieldname, find_key);
+        if(searchResult != NULL) searchResult->header = db->header;
 
-      // Mostra na tela todos os resultados encontrados, com exceção dos removidos
-      printSearchResult(searchResult, searchfieldname);
-
+        // Mostra na tela todos os resultados encontrados, com exceção dos removidos
+        printSearchResult(searchResult);
+      }
       break;
     case 7:
     {
@@ -145,30 +140,29 @@ int main(){
     case 8:
       // Manipulação de string do caminho do arquivo destino
       scanf("%s", filenamedest);
-      strcpy(tmp, FILEPATH);
-      strcat(tmp, filenamedest);
-      strcpy(filenamedest, tmp);
-
+      
       scanf("%d", &nRegistros);
       fgetc(stdin);
 
       filedest = openfile(filenamedest, "rb+");
 
-      // posiciona o ponteiro do arquivo para depois do status
-      fseek(filedest->fp, 1, SEEK_SET);
-      header = readHeaderfromBIN(filedest);
+      if(filedest != NULL){
+        // posiciona o ponteiro do arquivo para depois do status
+        fseek(filedest->fp, 1, SEEK_SET);
+        header = readHeaderfromBIN(filedest);
 
-      db = readDBfromStdin(nRegistros, header);
+        db = readDBfromStdin(nRegistros, header);
 
-      header = NULL;
+        header = NULL;
 
-      // posiciona o ponteiro no início do arquivo
-      fseek(filedest->fp, 0, SEEK_SET);
-      writeDB(filedest, db, 1);
+        // posiciona o ponteiro no início do arquivo
+        fseek(filedest->fp, 0, SEEK_SET);
+        writeDB(filedest, db, 1);
 
-      closefile(filedest);
+        closefile(filedest);
 
-      binarioNaTela(filenamedest);
+        binarioNaTela(filenamedest);
+      }
       break;
     default:
       printf ("ERRO CODIGO DA FUNCIONALIDADE INVALIDO!\n");         //codigo da funcionalidade fora do escopo

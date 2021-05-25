@@ -12,7 +12,8 @@ s_file_t *openfile(char *filename, char *openmode){
 	}
 	// Caso aconteça falha ao abrir o arquivo
 	else if(filename == NULL || !(file->fp = fopen(filename, openmode))){
-		printf("Erro ao abrir o arquivo!\n");
+		printf("Falha no processamento do arquivo\n");
+		free(file);
 		return NULL;
 	}
 	if(strcmp(filename, "stdin") != 0) fseek(file->fp, 0, SEEK_END);

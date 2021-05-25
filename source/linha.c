@@ -147,7 +147,7 @@ dataReg_t *readRegfromCSV(s_file_t *dataFile){
     fscanf(dataFile->fp, "%[^\n]", reg->corLinha);
     checkEOF = fgetc(dataFile->fp);
     reg->tamCor = (strcmp(reg->corLinha,"NULO") == 0)? 0 : strlen(reg->corLinha);
-    reg->tamRegistro = sizeof(reg->codLinha) + sizeof(reg->aceitaCartao) + reg->tamNome + reg->tamCor;
+    reg->tamRegistro = sizeof(reg->codLinha) + sizeof(reg->aceitaCartao) + reg->tamNome + reg->tamCor + 2 * sizeof(int);
     
     // Caso não tenha conseguido ler, retorna NULO
     if(checkEOF == -1){
@@ -245,7 +245,7 @@ dataReg_t *readRegfromStdin(){
     fgetc(stdin);
     scan_quote_string(reg->corLinha);
     if(strcmp(reg->corLinha, "NULO") != 0) reg->tamCor = strlen(reg->corLinha);
-    reg->tamRegistro = sizeof(reg->codLinha) + sizeof(reg->aceitaCartao) + reg->tamNome + reg->tamCor;
+    reg->tamRegistro = sizeof(reg->codLinha) + sizeof(reg->aceitaCartao) + reg->tamNome + reg->tamCor + 2 * sizeof(int);
     return reg;
 }
 
@@ -296,9 +296,11 @@ void writeDB(s_file_t *binFile, db_t *db, char writePartialHeaderFlag){
         writeReg(binFile, db->Regdatabase[pos]);
         pos++;
     }
+    db->header->byteProxReg = ftell(binFile->fp);
     // Mudando a consistência do arquivo
     fseek(binFile->fp, 0, SEEK_SET);
     fwrite("1", sizeof(char), 1, binFile->fp);
+    fwrite(&db->header->byteProxReg, sizeof(ll), 1, binFile->fp);
 }
 
 header_t *readHeaderfromBIN(s_file_t *dataFile){
@@ -529,7 +531,7 @@ db_t *searchAttrib(db_t *database, char *attribute, char *find_key){
 
 
 // Essa função mostra na tela todos os resultados encontrados com exceção dos excluidos
-void printSearchResult(db_t *searchResult, char *searchfieldname){
+void printSearchResult(db_t *searchResult){
     if(searchResult == NULL){ 
         printf("Registro inexistente.\n");
         return;
@@ -540,36 +542,27 @@ void printSearchResult(db_t *searchResult, char *searchfieldname){
     while(searchResult->Regdatabase[pos] != NULL){
         if(searchResult->Regdatabase[pos]->removido == '1'){
             // Printa o codLinha
-            if(searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "codLinha") != 0)) printf("%s: %d\n", searchResult->header->descreveCodigo, searchResult->Regdatabase[pos]->codLinha);
+            printf("%s: %d\n", searchResult->header->descreveCodigo, searchResult->Regdatabase[pos]->codLinha);
             // Printa o nomeLinha
-            if (searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "nomeLinha") != 0))
-            {
-                printf("%s: ", searchResult->header->descreveNome);
-                if(searchResult->Regdatabase[pos]->tamNome == 0) printf("campo com valor nulo\n");
-                else printf("%s\n", searchResult->Regdatabase[pos]->nomeLinha);
-            }
+            printf("%s: ", searchResult->header->descreveNome);
+            if(searchResult->Regdatabase[pos]->tamNome == 0) printf("campo com valor nulo\n");
+            else printf("%s\n", searchResult->Regdatabase[pos]->nomeLinha);
             // Printa o corLinha
-            if (searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "corLinha") != 0))
-            {
-                printf("%s: ", searchResult->header->descreveLinha);
-                if(searchResult->Regdatabase[pos]->tamCor == 0) printf("campo com valor nulo\n");
-                else printf("%s\n", searchResult->Regdatabase[pos]->corLinha);
-            }
+            printf("%s: ", searchResult->header->descreveLinha);
+            if(searchResult->Regdatabase[pos]->tamCor == 0) printf("campo com valor nulo\n");
+            else printf("%s\n", searchResult->Regdatabase[pos]->corLinha);
             // Printa o aceita cartão
-            if (searchfieldname == NULL || (searchfieldname != NULL && strcmp(searchfieldname, "aceitaCartao") != 0))
-            {
-                printf("%s: ", searchResult->header->descreveCartao);
-                switch(searchResult->Regdatabase[pos]->aceitaCartao){
-                    case 'S':
-                        printf("PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR\n");
-                        break;
-                    case 'N':
-                        printf("PAGAMENTO EM CARTAO E DINHEIRO\n");
-                        break;
-                    case 'F':
-                        printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
-                        break;
-                }
+            printf("%s: ", searchResult->header->descreveCartao);
+            switch(searchResult->Regdatabase[pos]->aceitaCartao){
+                case 'S':
+                    printf("PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR\n");
+                    break;
+                case 'N':
+                    printf("PAGAMENTO EM CARTAO E DINHEIRO\n");
+                    break;
+                case 'F':
+                    printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
+                    break;
             }
             printf("\n");
         }

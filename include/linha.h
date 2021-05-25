@@ -21,6 +21,6 @@ db_t *readDBfromStdin(int nRegistros, header_t *header);
 header_t *readHeaderfromBIN(s_file_t *dataFile);
 //header_t *readHeaderfromBIN2(s_file_t *binFile);
 db_t *searchAttrib(db_t * database, char *attribute, char *find_key);
-void printSearchResult(db_t * searchResult, char *searchfieldname);
+void printSearchResult(db_t * searchResult);
 
 #endif

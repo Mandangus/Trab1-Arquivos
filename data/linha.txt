@@ -1,0 +1,357 @@
+./database
+Codigo da linha: 150
+Nome da linha: C. MUSICA-V. ALEGRE
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 160
+Nome da linha: campo com valor nulo
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 164
+Nome da linha: R.PRADO-C.GOMES
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 165
+Nome da linha: UNIVERSIDADES
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 166
+Nome da linha: V. NORI
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 167
+Nome da linha: FREDOLIN WOLF
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 168
+Nome da linha: RAPOSO TAVARES
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 169
+Nome da linha: JD. KOSMOS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 170
+Nome da linha: campo com valor nulo
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 171
+Nome da linha: PRIMAVERA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 175
+Nome da linha: BOM RETIRO-PUC
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 176
+Nome da linha: PARQUE TANGUA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 180
+Nome da linha: AGUA VERDE-ABRANCHES
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 181
+Nome da linha: MATEUS LEME
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 182
+Nome da linha: ABRANCHES
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 183
+Nome da linha: JD. CHAPARRAL
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 184
+Nome da linha: V. SUICA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 201
+Nome da linha: campo com valor nulo
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 205
+Nome da linha: BARREIRINHA
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 207
+Nome da linha: CABRAL-OSORIO
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 260
+Nome da linha: MAL. HERMES-STA. EFIGENIA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 265
+Nome da linha: AHU-LOS ANGELES
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 266
+Nome da linha: ESTRIBO AHU
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 270
+Nome da linha: FERNANDO DE NORONHA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 271
+Nome da linha: LARANJEIRAS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 272
+Nome da linha: PAINEIRAS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 274
+Nome da linha: STA. GEMA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 275
+Nome da linha: F. NORONHA-LARANJEIRAS
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 280
+Nome da linha: NSA.SRA.DE NAZARE
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 360
+Nome da linha: NOVENA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 361
+Nome da linha: AUGUSTO STRESSER
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 365
+Nome da linha: JD. SOCIAL-BATEL
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 366
+Nome da linha: ITUPAVA-HOSP. MILITAR
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 370
+Nome da linha: RUA XV-BARIGUI
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 371
+Nome da linha: HIGIENOPOLIS
+Aceita cartao: PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA
+
+Codigo da linha: 372
+Nome da linha: TARUMA
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 373
+Nome da linha: ALTO TARUMA
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 374
+Nome da linha: HUGO LANGE
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 375
+Nome da linha: SAGRADO CORACAO
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 378
+Nome da linha: INTER-HOSPITAIS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 380
+Nome da linha: DETRAN-VIC. MACHADO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 385
+Nome da linha: CRISTO REI
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 386
+Nome da linha: CAJURU
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 387
+Nome da linha: PALOTINOS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 393
+Nome da linha: C. IMBUIA-PQ. BARIGUI
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 461
+Nome da linha: STA. BARBARA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 462
+Nome da linha: PETROPOLIS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 463
+Nome da linha: SOLITUDE
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 464
+Nome da linha: A. MUNHOZ-J. BOTANICO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 465
+Nome da linha: ERASTO  GAERTNER
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 466
+Nome da linha: ESTUDANTES
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 468
+Nome da linha: JD. CENTAURO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 471
+Nome da linha: V. SAO PAULO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 472
+Nome da linha: UBERABA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 474
+Nome da linha: JD. ITIBERE
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 475
+Nome da linha: CANAL BELEM
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 477
+Nome da linha: campo com valor nulo
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 560
+Nome da linha: ALFERES POLI
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 561
+Nome da linha: GUILHERMINA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 594
+Nome da linha: campo com valor nulo
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 661
+Nome da linha: LINDOIA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 662
+Nome da linha: DOM ATICO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 663
+Nome da linha: V. CUBAS
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 665
+Nome da linha: V. REX
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 666
+Nome da linha: NOVO MUNDO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 670
+Nome da linha: SAO JORGE
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 671
+Nome da linha: PORTAO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 673
+Nome da linha: FORMOSA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 674
+Nome da linha: NSA. SRA. DA LUZ
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 701
+Nome da linha: FAZENDINHA
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 703
+Nome da linha: CAIUA
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 706
+Nome da linha: CAIUA-FAZ-CENTRO
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 760
+Nome da linha: STA. QUITERIA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 761
+Nome da linha: V. IZABEL
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 762
+Nome da linha: V. ROSINHA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 777
+Nome da linha: V. VELHA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 778
+Nome da linha: COTOLENGO
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 779
+Nome da linha: campo com valor nulo
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 801
+Nome da linha: CAMP. SIQUEIRA-BATEL
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 860
+Nome da linha: V. SANDRA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 861
+Nome da linha: TRAMONTINA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 865
+Nome da linha: JD. ESPLANADA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 870
+Nome da linha: SAO BRAZ
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 875
+Nome da linha: BIGORRILHO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 876
+Nome da linha: SAVOIA
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 901
+Nome da linha: STA. FELICIDADE
+Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
+
+Codigo da linha: 965
+Nome da linha: SAO BERNARDO
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 967
+Nome da linha: JULIO GRAF
+Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
+
+Codigo da linha: 972
+Nome da linha: JD. ITALIA
+Aceita cartao: PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA
+
